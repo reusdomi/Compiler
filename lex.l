@@ -20,7 +20,7 @@
 
 [ \t]        ;
 
--        my_return ("unknown symbol");
+.        my_return ("unknown symbol");
 
 %%
 
