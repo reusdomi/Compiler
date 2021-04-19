@@ -1,7 +1,7 @@
-
 %{
 #include "yacc.tab.h"
 #include <stdlib.h>
+#include <string.h>
 void yyerror(char *);
 int yylineno;
 %}
