@@ -1,39 +1,17 @@
-%option noyywrap
+
 %{
-    #include<stdio.h>
-
-    int yylineno;
+#include "yacc.tab.h"
+#include <stdlib.h>
+void yyerror(char *);
 %}
-
 %%
-"if"        my_return ("IF");
-"then"        my_return ("THEN");
-"else"        my_return ("ELSE");
-
-[a-zA-Z]+    my_return ("ID");
-
-0        my_return ("INZEIGER");
-[1-9][0-9]*    my_return ("INZEIGER");
-
-\n        {printf ("\n\n");
-        yylineno++; };
-
-[ \t]        ;
-
-.        my_return ("unknown symbol");
-
+[0-9]+ { yylval = atoi(yytext);
+return INTEGER; }
+[a-zA-Z]+ {yylval = strdup(yytext);return ID; }
+[-+*/\n] return *yytext;
+[ \t] ; /* skip whitespace */
+. yyerror ("invalid character");
 %%
-
-
-int main()
-{
-	yylex();
-	return 0;
-}
-
-
-int my_return(char *token)
-{
-    printf ("\nZeile%d | ", yylineno);
-    printf("%s", token);
+int yywrap(void) {
+return 1;
 }

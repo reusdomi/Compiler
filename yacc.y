@@ -4,25 +4,27 @@
 	void yyerror(char *);
 %}
 
-%union 
-{
-        int number;
-        char *string;
-}
-%token <number> INTEGER
-%token <string> ID
-%type <number> expr
+%token INTEGER
+%token ID
 
-%% 
-program: program expr '\n' { printf("%s\n", $2); }
-	| ;
-expr: ID		{  $$ = $1; }
-	|INTEGER	{  $$ = $1; }
-	/*| IF expr	{ printf("%d\n", $2); }
-	| THEN expr	{ printf("%d\n", $2); }
-	| ELSE expr	{ printf("%d\n", $2); }*/;
 %%
-void yyerror(char *s) { fprintf(stderr, "%s\n", s); }
-int main(void) { yyparse();
-return 0;
+program: program expr '\n' { printf("\n"); }
+	| ;
+expr:	ID		{ printf("%s", $1); }
+	|int		{ printf("%d", $1); }
+	|expr expr	{ ; } ;		
+int:	INTEGER		{ $$=$1; }
+	| int '+' int	{ $$=$1 + $3; }
+	| int '-' int	{ $$=$1 - $3; }
+	| int '*' int	{ $$=$1 * $3; }
+	| int '/' int	{ $$=$1 / $3; } ;
+%%
+
+void yyerror(char *s) {
+	fprintf(stderr, "%s\n", s);
+}
+
+int main(void) {
+	yyparse();
+	return 0;
 }
