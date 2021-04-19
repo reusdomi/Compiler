@@ -10,7 +10,7 @@ int yylineno;
 return INTEGER; }
 [a-zA-Z]+ {yylval = strdup(yytext);return ID; }
 [-+*/] return *yytext;
-\n        {printf ("\n"); yylineno++; };
+\n        {return *yytext; printf ("\n"); yylineno++; };
 [ \t] ; /* skip whitespace */
 . my_return ("unknown symbol");
 %%
