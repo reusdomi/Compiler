@@ -3,15 +3,22 @@
 #include "yacc.tab.h"
 #include <stdlib.h>
 void yyerror(char *);
+int yylineno;
 %}
 %%
 [0-9]+ { yylval = atoi(yytext);
 return INTEGER; }
 [a-zA-Z]+ {yylval = strdup(yytext);return ID; }
-[-+*/\n] return *yytext;
+[-+*/] return *yytext;
+\n        {printf ("\n"); yylineno++; };
 [ \t] ; /* skip whitespace */
-. yyerror ("invalid character");
+. my_return ("unknown symbol");
 %%
+int my_return(char *token)
+{
+    printf ("\nZeile%d | ", yylineno);
+    printf("%s", token);
+}
 int yywrap(void) {
 return 1;
 }
