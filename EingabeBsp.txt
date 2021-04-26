@@ -1,8 +1,0 @@
-Hallo
-Das ist ein Testfile!
-Bitte lies mich aus!!!!!
-if
-/*hjashfaafjsj*/
-then
-else
-1+1;
