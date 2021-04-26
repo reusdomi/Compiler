@@ -20,10 +20,10 @@ int:	INTEGER			{ $$ = $1; }
 	| int '/' int		{ if($3 == 0)
 					yyerror("durch null teilen geht nicht");
 				  else
-					$$=$1 / $3;
+					$$ = $1 / $3;
 				}
 	| '-' int		{ $$ = -$2; }
-	| '(' int ')'	{ $$ = $1; }
+	| '(' int ')'		{ $$ = $1; }
 	;
 %%
 
