@@ -4,26 +4,27 @@
 	void yyerror(char *);
 %}
 
-%token INTEGER ID
+%token INTEGER ID BLANK
 
 %%
-program: program expr '\n' { printf("\n"); }
+program: program expr ';' { printf("\n"); }
 	| ;
 expr:	ID		{ printf("%s", $1); }
-	|int		{ printf("%d", $1); }
+	|bcalc		{ printf("%d", $1); }
 	|expr expr	{ ; }
+	|BLANK
 	;		
-int:	INTEGER			{ $$ = $1; }
-	| int '+' int		{ $$ = $1 + $3; }
-	| int '-' int		{ $$ = $1 - $3; }
-	| int '*' int		{ $$ = $1 * $3; }
-	| int '/' int		{ if($3 == 0)
+bcalc:	INTEGER			{ $$ = $1; }
+	| bcalc '+' bcalc 		{ $$ = $1 + $3; }
+	| bcalc '-' bcalc 		{ $$ = $1 - $3; }
+	| bcalc '*' bcalc 		{ $$ = $1 * $3; }
+	| bcalc '/' bcalc 		{ if($3 == 0)
 					yyerror("durch null teilen geht nicht");
 				  else
 					$$=$1 / $3;
 				}
-	| '-' int		{ $$ = -$2; }
-	| '(' int ')'	{ $$ = $1; }
+	| '-' bcalc		{ $$ = -$2; }
+	| '(' bcalc ')'	{ $$ = $1; }
 	;
 %%
 
