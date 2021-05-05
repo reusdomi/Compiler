@@ -12,7 +12,7 @@
 [0-9]+ { yylval = atoi(yytext);
 return INTEGER; }
 [a-zA-Z]+ { yylval = strdup(yytext); return ID; }
-[-+*/] return *yytext;
+[-+*/()] return *yytext;
 ";"        { return *yytext; printf ("\n"); yylineno++; };
 [ \t] ; /* skip whitespace */
 . my_return ("unknown symbol");

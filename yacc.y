@@ -15,16 +15,16 @@ expr:	ID		{ printf("%s", $1); }
 	|BLANK
 	;		
 bcalc:	INTEGER			{ $$ = $1; }
-	| bcalc '+' bcalc 		{ $$ = $1 + $3; }
-	| bcalc '-' bcalc 		{ $$ = $1 - $3; }
-	| bcalc '*' bcalc 		{ $$ = $1 * $3; }
-	| bcalc '/' bcalc 		{ if($3 == 0)
+	| bcalc '+' bcalc 	{ $$ = $1 + $3; }
+	| bcalc '-' bcalc 	{ $$ = $1 - $3; }
+	| bcalc '*' bcalc 	{ $$ = $1 * $3; }
+	| bcalc '/' bcalc 	{ if($3 == 0)
 					yyerror("durch null teilen geht nicht");
 				  else
 					$$=$1 / $3;
 				}
 	| '-' bcalc		{ $$ = -$2; }
-	| '(' bcalc ')'	{ $$ = $1; }
+	| '(' bcalc ')'		{ $$ = $2; }
 	;
 %%
 
