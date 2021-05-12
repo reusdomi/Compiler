@@ -1,8 +1,10 @@
-Hallo
-Das ist ein Testfile!
-Bitte lies mich aus!!!!!
-if
-/*hjasghj*/
-//huaudh
-then
-else
+Testfile;
+1+1;
+2+3;
+int i = 5;
+int z = 3;
+int i = 4;
+int r = 5+6;
+String s = test;
+String t = test2;
+String z = error;
