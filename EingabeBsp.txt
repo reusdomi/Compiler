@@ -1,6 +1,8 @@
 Testfile;
+3/0;
 1+1;
 2+3;
+10/0;
 int i = 5;
 int z = 3;
 int i = 4;

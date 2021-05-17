@@ -3,6 +3,7 @@
 	#include<limits.h>
 	#include<stdlib.h>
 	int yylex(void);
+	int yylineno;
 	void yyerror(char *);
 	struct decla {
 		char *name;
@@ -55,7 +56,7 @@
 				dec_temp=dec_temp->next;
 			}
 			if(strcmp(dec_temp->name, name) == 0){
-				printf("Variablenname bereits vergeben!\n");
+				my_return("Variablenname bereits vergeben!\n");
 			}
 			else{
 	  			dec_temp->next = decl_create( name, type, e, NULL );
@@ -82,7 +83,7 @@ bcalc:	INTEGER			{ $$ = $1; }
 	| bcalc '-' bcalc 	{ $$ = $1 - $3; }
 	| bcalc '*' bcalc 	{ $$ = $1 * $3; }
 	| bcalc '/' bcalc 	{ if($3 == 0)
-					yyerror("durch null teilen geht nicht");
+					my_return("durch Null teilen geht nicht");
 				  else
 					$$=$1 / $3;
 				}
@@ -96,10 +97,17 @@ decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_
 	;
 %%
 
+int my_return(char *token) {
+	printf ("\nZeile %d | %s", yylineno, token);
+}
+
+void newLine() {
+	yylineno++;
+}
+
 void yyerror(char *s) {
 	fprintf(stderr, "%s\n", s);
 }
-
 
 int main(void) {
 	yyparse();
