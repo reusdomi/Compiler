@@ -155,8 +155,9 @@ decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_
 	;
 %%
 
-int my_return(char *token) {
+void my_return(char *token) {
 	printf ("\nZeile %d | %s\n", yylineno, token);
+	exit(1);
 }
 
 void newLine() {

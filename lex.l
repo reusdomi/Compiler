@@ -3,7 +3,6 @@
 	#include <stdlib.h>
 	#include <string.h>
 	void yyerror(char *);
-	void newLine();
 %}
 
 %%
