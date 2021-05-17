@@ -9,7 +9,7 @@
 		char *type;
 		struct expres *value;
 		struct decla *next;
-	} ;
+	};
 	struct decla *declar = NULL;
 	struct expres {
 		char *type;
@@ -147,11 +147,10 @@ bcalc:	ID			{ char *n = $1; $$ = getValue(n);}
 	| '-' bcalc		{ $$ = $1; }
 	| '(' bcalc ')'		{ $$ = $2; }
 	;
-decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n);printf("int %s", n);}
-	| 'String' ID		{char *n = $2;createDecl("String",expr_create_string_literal(NULL), n);printf("String %s", n);}
-	| 'int' ID '=' bcalc	{char *n = $2;createDecl("int",expr_create_integer_literal($4), n);printf("int %s = %d", n, $4);}
-	| 'String' ID '=' ID	{char *n = $2; char *v = $4;createDecl("String",expr_create_string_literal(v), n);printf("String %s = %s", n, v);}
-	
+decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n); printf("int %s", n);}
+	| 'String' ID		{char *n = $2; createDecl("String",expr_create_string_literal(NULL), n); printf("String %s", n);}
+	| 'int' ID '=' bcalc	{char *n = $2; createDecl("int",expr_create_integer_literal($4), n); printf("int %s = %d", n, $4);}
+	| 'String' ID '=' ID	{char *n = $2; char *v = $4; createDecl("String",expr_create_string_literal(v), n); printf("String %s = %s", n, v);}
 	;
 %%
 

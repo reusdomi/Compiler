@@ -9,8 +9,7 @@
 %%
 "//".* {return BLANK;};
 "/*".*"*/" {return BLANK;};
-[0-9]+ { yylval = atoi(yytext);
-return INTEGER; }
+[0-9]+ { yylval = atoi(yytext); return INTEGER; }
 "int"|"String" return *yytext;
 [a-zA-Z]+ { yylval = strdup(yytext); return ID; }
 [-+*/()=] return *yytext;
@@ -21,7 +20,7 @@ return INTEGER; }
 
 int my_return(char *token)
 {
-    printf ("\nZeile%d | ", yylineno);
+    printf ("\nZeile %d | ", yylineno);
     printf("%s", token);
 }
 
