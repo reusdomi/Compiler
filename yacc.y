@@ -17,9 +17,9 @@
 		char *sValue;
 	};
 	struct decla * decl_create( char *name,
-	char *type,
-	struct expres *value,
-	struct decla *next )
+		char *type,
+		struct expres *value,
+		struct decla *next )
 	{
 		struct decla *d = malloc(sizeof(*d));
 		d->name = name;
@@ -28,42 +28,42 @@
 		d->next = next;
 		return d;
 	}
-struct expres * expr_create_string_literal( const char *str ){
-	struct expres *e = malloc(sizeof(*e));
-	e->type = "String";
-	e->value = INT_MIN;
-	e->sValue = *str;
-	return e;
-}
-struct expres * expr_create_integer_literal( int i ){
-	struct expres *e = malloc(sizeof(*e));
-	e->type = "int";
-	e->value = i;
-	e->sValue = NULL;
-	return e;
-}
-void createDecl(char *type, struct expres *e, char *name){
-	if (!declar){
-		declar = malloc(sizeof(*declar));
-		declar = decl_create( name, type, e, NULL );
+	struct expres * expr_create_string_literal( const char *str ){
+		struct expres *e = malloc(sizeof(*e));
+		e->type = "String";
+		e->value = INT_MIN;
+		e->sValue = *str;
+		return e;
 	}
-	else{
-		struct decla *dec_temp = malloc(sizeof(*dec_temp));
-		dec_temp = declar;
-		while(dec_temp->next && strcmp(dec_temp->name, name) != 0){
-			printf("While\nVar %s: %d\n", dec_temp->name, dec_temp->value->value);
-			dec_temp=dec_temp->next;
-		}
-		if(strcmp(dec_temp->name, name) == 0){
-			printf("Variablenname bereits vergeben!\n");
+	struct expres * expr_create_integer_literal( int i ){
+		struct expres *e = malloc(sizeof(*e));
+		e->type = "int";
+		e->value = i;
+		e->sValue = NULL;
+		return e;
+	}
+	void createDecl(char *type, struct expres *e, char *name){
+		if (!declar){
+			declar = malloc(sizeof(*declar));
+			declar = decl_create( name, type, e, NULL );
 		}
 		else{
-	  		dec_temp->next = decl_create( name, type, e, NULL );
-			printf("Else\n");
+			struct decla *dec_temp = malloc(sizeof(*dec_temp));
+			dec_temp = declar;
+			while(dec_temp->next && strcmp(dec_temp->name, name) != 0){
+				/*printf("While\nVar %s: %d\n", dec_temp->name, dec_temp->value->value);*/
+				dec_temp=dec_temp->next;
+			}
+			if(strcmp(dec_temp->name, name) == 0){
+				printf("Variablenname bereits vergeben!\n");
+			}
+			else{
+	  			dec_temp->next = decl_create( name, type, e, NULL );
+				/*printf("Else\n");*/
+			}
 		}
-	}
 
-}
+	}
 %}
 
 %token INTEGER ID BLANK
@@ -89,8 +89,11 @@ bcalc:	INTEGER			{ $$ = $1; }
 	| '-' bcalc		{ $$ = -$2; }
 	| '(' bcalc ')'		{ $$ = $2; }
 	;
-decl:	'int' ID '=' bcalc	{createDecl("int",expr_create_integer_literal($4), $2);printf("int %s = %d", $2, $4);}
-	| 'String' ID '=' ID	{char *s = $4; createDecl("String",expr_create_string_literal(s), $2);printf("String %s = %s", $2, $4);}
+decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n);printf("int %s", n);}
+	| 'String' ID		{char *n = $2;createDecl("String",expr_create_string_literal(NULL), n);printf("String %s", n);}
+	| 'int' ID '=' bcalc	{char *n = $2;createDecl("int",expr_create_integer_literal($4), n);printf("int %s = %d", n, $4);}
+	| 'String' ID '=' ID	{char *n = $2; char *v = $4;createDecl("String",expr_create_string_literal(v), n);printf("String %s = %s", n, v);}
+	
 	;
 %%
 
