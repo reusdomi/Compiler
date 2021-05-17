@@ -56,7 +56,7 @@
 				dec_temp=dec_temp->next;
 			}
 			if(strcmp(dec_temp->name, name) == 0){
-				my_return("Variablenname bereits vergeben!\n");
+				my_return("Variablenname bereits vergeben!");
 			}
 			else{
 	  			dec_temp->next = decl_create( name, type, e, NULL );
@@ -76,7 +76,7 @@
 			}
 			dec_temp=dec_temp->next;
 		}
-		yyerror("Variable noch nicht deklariert");
+		my_return("Variable noch nicht deklariert");
 		return 0;
 	}
 	
@@ -97,12 +97,12 @@
 					return 1;
 				}
 				else{
-					yyerror("Variable vom Typ 'String'!");
+					my_return("Variable vom Typ 'String'!");
 					return 0;
 				}
 		}
 		else{
-			yyerror("Variable noch nicht deklariert");
+			my_return("Variable noch nicht deklariert");
 			return 0;
 		}
 	}
@@ -118,7 +118,7 @@
 				return dec_temp->value->value;
 			}
 			else{
-				yyerror("Variable besitzt noch keinen Wert!");
+				my_return("Variable besitzt noch keinen Wert!");
 			}
 		}
 	}
@@ -156,7 +156,7 @@ decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_
 %%
 
 int my_return(char *token) {
-	printf ("\nZeile %d | %s", yylineno, token);
+	printf ("\nZeile %d | %s\n", yylineno, token);
 }
 
 void newLine() {
