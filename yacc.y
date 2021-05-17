@@ -62,7 +62,64 @@
 				/*printf("Else\n");*/
 			}
 		}
+	}
+	int checkString(char *name){
+		struct decla *dec_temp = malloc(sizeof(*dec_temp));
+		dec_temp = declar;
+		while(dec_temp->next){
+			if(strcmp(dec_temp->name, name) == 0){
+				if(strcmp(dec_temp->type, "String")==0){
+					return 1;
+				}
+				else{return 0;}
+			}
+			dec_temp=dec_temp->next;
+		}
+		yyerror("Variable noch nicht deklariert");
+		return 0;
+	}
+	
+	int checkInt(char *name){
+		struct decla *dec_temp = malloc(sizeof(*dec_temp));
+		dec_temp = declar;
+		while(dec_temp->next){
+			if(strcmp(dec_temp->name, name) == 0){
+				if(strcmp(dec_temp->type, "int")==0){
+					return 1;
+				}
+				else{return 0;}
+			}
+			dec_temp=dec_temp->next;
+		}
+		if(strcmp(dec_temp->name, name) == 0){
+				if(strcmp(dec_temp->type, "int")==0){
+					return 1;
+				}
+				else{
+					yyerror("Variable vom Typ 'String'!");
+					return 0;
+				}
+		}
+		else{
+			yyerror("Variable noch nicht deklariert");
+			return 0;
+		}
+	}
 
+	int getValue(char *name){
+		if(checkInt(name)){
+			struct decla *dec_temp = malloc(sizeof(*dec_temp));
+			dec_temp = declar;
+			while(strcmp(dec_temp->name, name) != 0){
+				dec_temp=dec_temp->next;
+			}
+			if(dec_temp->value->value != INT_MIN){
+				return dec_temp->value->value;
+			}
+			else{
+				yyerror("Variable besitzt noch keinen Wert!");
+			}
+		}
 	}
 %}
 
@@ -77,7 +134,8 @@ expr:	ID		{ printf("%s", $1); }
 	|decl
 	|BLANK
 	;		
-bcalc:	INTEGER			{ $$ = $1; }
+bcalc:	ID			{ char *n = $1; $$ = getValue(n);} 
+	| INTEGER		{ $$ = $1; }
 	| bcalc '+' bcalc 	{ $$ = $1 + $3; }
 	| bcalc '-' bcalc 	{ $$ = $1 - $3; }
 	| bcalc '*' bcalc 	{ $$ = $1 * $3; }
@@ -86,7 +144,7 @@ bcalc:	INTEGER			{ $$ = $1; }
 				  else
 					$$=$1 / $3;
 				}
-	| '-' bcalc		{ $$ = -$2; }
+	| '-' bcalc		{ $$ = $1; }
 	| '(' bcalc ')'		{ $$ = $2; }
 	;
 decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n);printf("int %s", n);}
