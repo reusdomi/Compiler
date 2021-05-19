@@ -122,6 +122,29 @@
 			}
 		}
 	}
+
+	void assign(int v, char *name){
+	struct decla *dec_temp = malloc(sizeof(*dec_temp));
+	dec_temp = declar;
+	
+	
+	while(dec_temp){
+	
+	if(strcmp(dec_temp->name, name) == 0){
+		//printf("value: %i \n", v);
+		dec_temp->value = v;
+		//printf("seems to work \n");
+		//printf("t->value: %i \n", dec_temp->value);
+		}else{
+		if(!dec_temp->next){printf("Keine solche Variable enthalten \n");}
+		}
+	
+	if(dec_temp->next){dec_temp =dec_temp->next;}else{break;}
+	
+	}
+	
+
+	}
 %}
 
 %token INTEGER ID BLANK
@@ -152,6 +175,8 @@ decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_
 	| 'String' ID		{char *n = $2; createDecl("String",expr_create_string_literal(NULL), n); printf("String %s", n);}
 	| 'int' ID '=' bcalc	{char *n = $2; createDecl("int",expr_create_integer_literal($4), n); printf("int %s = %d", n, $4);}
 	| 'String' ID '=' ID	{char *n = $2; char *v = $4; createDecl("String",expr_create_string_literal(v), n); printf("String %s = %s", n, v);}
+	| ID '=' bcalc		{char *n = $1; assign($3,n);}
+	
 	;
 %%
 
