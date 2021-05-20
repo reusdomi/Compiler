@@ -6,15 +6,15 @@
 %}
 
 %%
-"//".* {return BLANK;};
-"/*".*"*/" {return BLANK;};
-[0-9]+ { yylval = atoi(yytext); return INTEGER; }
-"int"|"String" return *yytext;
-[a-zA-Z]+ { yylval = strdup(yytext); return ID; }
-[-+*/()=] return *yytext;
-";"       { newLine(); return *yytext; printf ("\n"); };
-[ \t] ; /* skip whitespace */
-. my_return ("unknown symbol");
+"//".*		{return BLANK;};
+"/*".*"*/"	{return BLANK;};
+[0-9]+		{yylval = atoi(yytext); return INTEGER; }
+"int"|"String"	{return *yytext;}
+[a-zA-Z]+	{yylval = strdup(yytext); return ID; }
+[-+*/()=]	{return *yytext;}
+";"		{newLine(); return *yytext;}
+[ \t]		{;} /* skip whitespace */
+.		{my_return ("unknown symbol");}
 %%
 
 int yywrap(void) {

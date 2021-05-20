@@ -124,39 +124,43 @@
 	}
 
 	void assign(int v, char *name){
-	struct decla *dec_temp = malloc(sizeof(*dec_temp));
-	dec_temp = declar;
-	
-	
-	while(dec_temp){
-	
-	if(strcmp(dec_temp->name, name) == 0){
-		printf("value before : %i \n", dec_temp->value->value);
-		printf("value: %i \n", v);
-		dec_temp->value->value = v;
-		printf("seems to work \n");
-		printf("t->value: %i \n", dec_temp->value->value);
-		}else{
-		if(!dec_temp->next){printf("Keine solche Variable enthalten \n");}
+		struct decla *dec_temp = malloc(sizeof(*dec_temp));
+		dec_temp = declar;
+		
+		while(dec_temp){
+		
+			if(strcmp(dec_temp->name, name) == 0){
+				//printf("value before : %i \n", dec_temp->value->value);
+				//printf("value: %i \n", v);
+				dec_temp->value->value = v;
+				//printf("seems to work \n");
+				//printf("t->value: %i \n", dec_temp->value->value);
+			}else{
+				if(!dec_temp->next){printf("Keine solche Variable enthalten \n");}
+			}
+			
+			if(dec_temp->next){
+				dec_temp =dec_temp->next;
+			}else{
+				break;
+			}
 		}
-	
-	if(dec_temp->next){dec_temp =dec_temp->next;}else{break;}
-	
-	}
-	
-
 	}
 %}
 
 %token INTEGER ID BLANK
 
 %%
-program: program expr ';' { printf("\n"); }
+program: program expr ';' {;}
 	| ;
-expr:	ID		{ printf("%s", $1); }
-	|bcalc		{ printf("%d", $1); }
-	|expr expr	{ ; }
-	|decl
+expr:	ID ';'		{ printf("\n%s;", $1); }
+	|bcalc ';'		{ printf("\n%d;", $1); }
+	|expr expr ';'		{ ; }
+	|decl ';'
+
+	| error '\n'		{my_return("';' expected");}
+	| error ';'		{my_return("error in expression");}
+
 	|BLANK
 	;		
 bcalc:	ID			{ char *n = $1; $$ = getValue(n);} 
@@ -171,19 +175,30 @@ bcalc:	ID			{ char *n = $1; $$ = getValue(n);}
 				}
 	| '-' bcalc		{ $$ = $1; }
 	| '(' bcalc ')'		{ $$ = $2; }
+
+	| error '+' bcalc	{my_return("first operand missing");}
+	| error '-' bcalc	{my_return("first operand missing");}
+	| error '*' bcalc	{my_return("first operand missing");}
+	| error '/' bcalc	{my_return("first operand missing");}
+	| bcalc '+' error	{my_return("second operand missing");}
+	| bcalc '-' error	{my_return("second operand missing");}
+	| bcalc '*' error	{my_return("second operand missing");}
+	| bcalc '/' error	{my_return("second operand missing");}
+	| error bcalc ')'	{my_return("'(' expected");}
+	| '(' bcalc error	{my_return("')' expected");}
 	;
-decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n); printf("int %s", n);}
-	| 'String' ID		{char *n = $2; createDecl("String",expr_create_string_literal(NULL), n); printf("String %s", n);}
-	| 'int' ID '=' bcalc	{char *n = $2; createDecl("int",expr_create_integer_literal($4), n); printf("int %s = %d", n, $4);}
-	| 'String' ID '=' ID	{char *n = $2; char *v = $4; createDecl("String",expr_create_string_literal(v), n); printf("String %s = %s", n, v);}
+decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n); printf("int %s;", n);}
+	| 'String' ID		{char *n = $2; createDecl("String",expr_create_string_literal(NULL), n); printf("String %s;", n);}
+	| 'int' ID '=' bcalc	{char *n = $2; createDecl("int",expr_create_integer_literal($4), n); printf("int %s = %d;", n, $4);}
+	| 'String' ID '=' ID	{char *n = $2; char *v = $4; createDecl("String",expr_create_string_literal(v), n); printf("String %s = %s;", n, v);}
 	| ID '=' bcalc		{char *n = $1; assign($3,n);}
 	
 	;
 %%
 
 void my_return(char *token) {
-	printf ("\nZeile %d | %s\n", yylineno, token);
-	exit(1);	//Beendet das Programm
+	printf ("\nZeile %d | %s;", yylineno, token);
+	//exit(1);	//Beendet das Programm
 }
 
 void newLine() {
@@ -191,7 +206,7 @@ void newLine() {
 }
 
 void yyerror(char *s) {
-	fprintf(stderr, "%s\n", s);
+	fprintf(stderr, "%s;", s);
 }
 
 int main(void) {
