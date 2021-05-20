@@ -131,10 +131,11 @@
 	while(dec_temp){
 	
 	if(strcmp(dec_temp->name, name) == 0){
-		//printf("value: %i \n", v);
-		dec_temp->value = v;
-		//printf("seems to work \n");
-		//printf("t->value: %i \n", dec_temp->value);
+		printf("value before : %i \n", dec_temp->value->value);
+		printf("value: %i \n", v);
+		dec_temp->value->value = v;
+		printf("seems to work \n");
+		printf("t->value: %i \n", dec_temp->value->value);
 		}else{
 		if(!dec_temp->next){printf("Keine solche Variable enthalten \n");}
 		}
