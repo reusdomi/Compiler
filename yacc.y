@@ -183,7 +183,7 @@ decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_
 
 void my_return(char *token) {
 	printf ("\nZeile %d | %s\n", yylineno, token);
-	exit(1);
+	exit(1);	//Beendet das Programm
 }
 
 void newLine() {
