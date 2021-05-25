@@ -148,16 +148,18 @@
 	}
 %}
 
-%token INTEGER ID BLANK IF ELSE FOR
+%token INTEGER ID BLANK IF ELSE FOR PRINT
 
 %%
 program: program expr ';' {;}
 	| ;
 expr:	cond			{ ; }
-	|ID ';'			{ printf("\n%s;", $1); }
-	|bcalc ';'		{ printf("\n%d;", $1); }
+	|ID ';'			{ ; }
+	|bcalc ';'		{ ; }
 	|expr expr ';'		{ ; }
 	|decl ';'
+
+	|print ';'		{ ; }
 
 	| error '\n'		{my_return("';' expected");}
 	| error ';'		{my_return("error in expression");}
@@ -173,11 +175,14 @@ cond:	IF comp expr		{ if($2 == 1)
 					$$=$5;
 				}
 	;
-comp:	'(' INTEGER '==' INTEGER ')'	{ if($2 == $5)
+comp:	'(' bcalc '=''=' bcalc ')'	{ if($2 == $5)
 						$$=1;
 					  else
 						$$=0;
 					}
+	;
+print:	PRINT '(' bcalc ')'	{ printf("\n%d", $3); }
+	|PRINT '{' ID ')'	{ printf("\n%s", $3); }
 	;
 bcalc:	ID			{ char *n = $1; $$ = getValue(n);} 
 	| INTEGER		{ $$ = $1; }
@@ -200,8 +205,8 @@ bcalc:	ID			{ char *n = $1; $$ = getValue(n);}
 	| bcalc '-' error	{my_return("second operand missing");}
 	| bcalc '*' error	{my_return("second operand missing");}
 	| bcalc '/' error	{my_return("second operand missing");}
-	//| error bcalc ')'	{my_return("'(' expected");}
-	//| '(' bcalc error	{my_return("')' expected");}
+	| error bcalc ')'	{my_return("'(' expected");}
+	| '(' bcalc error	{my_return("')' expected");}
 	;
 decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n); printf("int %s;", n);}
 	| 'String' ID		{char *n = $2; createDecl("String",expr_create_string_literal(NULL), n); printf("String %s;", n);}

@@ -13,6 +13,7 @@
 "if"		{return IF;}
 "else"		{return ELSE;}
 "for"		{return FOR;}
+"print"		{return PRINT;}
 [a-zA-Z]+	{yylval = strdup(yytext); return ID; }
 [-+*/()=]	{return *yytext;}
 ";"		{newLine(); return *yytext;}
