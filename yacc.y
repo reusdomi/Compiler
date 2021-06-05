@@ -5,6 +5,7 @@
 	int yylex(void);
 	int yylineno;
 	void yyerror(char *);
+
 	struct decla {
 		char *name;
 		char *type;
@@ -146,6 +147,28 @@
 			}
 		}
 	}
+
+	/* -------------- parsing tree ----------------- */
+
+	struct calculation{
+		char* node_type;
+		struct calculation *left;
+		struct calculation *right;
+		int value;
+	};
+	
+
+	struct calculation *create_calculation(char* nodetype, struct calculation *c1, struct calculation *c2, int val){
+		struct calculation *c = malloc(sizeof(struct calculation));
+		c->node_type = nodetype;
+		c->left = c1;
+		c->right = c2;
+		c->value = val;
+		
+		printf("%s",c->node_type);
+		return c;
+	}
+
 %}
 
 %token INTEGER ID BLANK IF ELSE FOR PRINT
@@ -184,15 +207,15 @@ comp:	'(' bcalc '=''=' bcalc ')'	{ if($2 == $5)
 print:	PRINT '(' bcalc ')'	{ printf("\n%d", $3); }
 	|PRINT '{' ID ')'	{ printf("\n%s", $3); }
 	;
-bcalc:	ID			{ char *n = $1; $$ = getValue(n);} 
-	| INTEGER		{ $$ = $1; }
-	| bcalc '+' bcalc 	{ $$ = $1 + $3; }
-	| bcalc '-' bcalc 	{ $$ = $1 - $3; }
-	| bcalc '*' bcalc 	{ $$ = $1 * $3; }
+bcalc:	ID			{ char *n = $1;$$ = create_calculation("int",NULL,NULL,getValue(n));} 
+	| INTEGER		{ $$ = create_calculation("int",NULL,NULL,$1); }
+	| bcalc '+' bcalc 	{ $$ = create_calculation("+",$1,$2,NULL); }
+	| bcalc '-' bcalc 	{ $$ = create_calculation("-",$1,$2,NULL); }
+	| bcalc '*' bcalc 	{ $$ = create_calculation("*",$1,$2,NULL); }
 	| bcalc '/' bcalc 	{ if($3 == 0)
 					my_return("durch Null teilen geht nicht");
 				  else
-					$$=$1 / $3;
+					$$ = create_calculation("/",$1,$2,NULL);;
 				}
 	| '-' bcalc		{ $$ = $1; }
 	| '(' bcalc ')'		{ $$ = $2; }
@@ -210,7 +233,7 @@ bcalc:	ID			{ char *n = $1; $$ = getValue(n);}
 	;
 decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n); printf("int %s;", n);}
 	| 'String' ID		{char *n = $2; createDecl("String",expr_create_string_literal(NULL), n); printf("String %s;", n);}
-	| 'int' ID '=' bcalc	{char *n = $2; createDecl("int",expr_create_integer_literal($4), n); printf("int %s = %d;", n, $4);}
+	| 'int' ID '=' bcalc	{char *n = $2; createDecl("int",expr_create_integer_literal($4->value), n); printf("int %s = %d;", n, $4->value);}
 	| 'String' ID '=' ID	{char *n = $2; char *v = $4; createDecl("String",expr_create_string_literal(v), n); printf("String %s = %s;", n, v);}
 	| ID '=' bcalc		{char *n = $1; assign($3,n);}
 	
