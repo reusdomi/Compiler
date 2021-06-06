@@ -154,6 +154,9 @@
 	}
 
 	/* -------------- parsing tree ----------------- */
+	
+	struct expression;
+	struct expression *root = NULL;
 
 	struct calculation{
 		char* node_type;
@@ -176,12 +179,105 @@
 
 	struct integer  *create_integer(char* nodetype, int val){
 		struct integer *i = malloc(sizeof(struct integer));
-			i->node_type = nodetype;
-			i->value = val;
+		i->node_type = nodetype;
+		i->value = val;
 		printf("%s",i->node_type);
 		printf("%d",i->value);
 		return i;
 	}
+	struct comparison{
+		char* node_type;
+		struct calculation *left;
+		struct calculation *right;
+	};
+	struct comparison *create_comparison(char* node_type,struct calculation *left,struct calculation *right){
+		struct comparison *c = malloc(sizeof(struct comparison));
+		c->node_type = node_type;
+		c->left = left;
+		c->right = right;
+		
+		printf("%s",c->node_type);
+		return c;
+	}
+
+	struct condition{
+		char* node_type;
+		struct comparison *comp;
+		struct expression *exprif;
+		struct expression *exprelse;
+	};
+	struct condition *create_condition(char* node_type,struct comparison *comp,struct expression *exprif,struct expression *exprelse){
+		struct condition *c = malloc(sizeof(struct condition));
+		c->node_type = node_type;
+		c->comp = comp;
+		c->exprif = exprif;
+		c->exprelse = exprelse;
+		
+		printf("%s",c->node_type);
+		return c;
+	}
+
+	struct identifier{
+		char* node_type;
+		char* value;
+	};
+	struct identifier *create_identifier(char* node_type,char* value){
+		struct identifier *i = malloc(sizeof(struct identifier));
+		i->node_type = node_type;
+		i->value = value;
+		
+		printf("%s",i->node_type);
+		return i;
+	}
+
+	struct print{
+		char* node_type;
+		struct calculation *calc;
+		struct identifier *id;
+	};
+	struct print *create_print(char* node_type,struct calculation *calc,struct identifier *id){
+		struct print *p = malloc(sizeof(struct print));
+		p->node_type = node_type;
+		p->calc = calc;
+		p->id = id;
+		
+		printf("%s",p->node_type);
+		return p;
+	}
+
+	struct expression{
+		char* node_type;
+		struct expression *expr;
+		struct condition *cond;
+		struct identifier *id;
+		struct calculation *calc;
+		struct decla *decl;
+		struct print *print;
+	};
+	struct expression *create_expression(char* node_type,
+						struct expression *expr,
+						struct condition *cond,
+						struct identifier *id,
+						struct calculation *calc,
+						struct decla *decl,
+						struct print *print){
+		struct expression *e = malloc(sizeof(struct expression));
+		e->node_type = node_type;
+		e->expr = expr;
+		e->cond = cond;
+		e->id = id;
+		e->calc = calc;
+		e->decl = decl;
+		e->print = print;
+		
+		if(!root){
+			root = e;
+		}
+
+		printf("%s",e->node_type);
+		return e;
+	}
+	
 
 %}
 
@@ -189,38 +285,25 @@
 
 
 %%
-program: program expr ';' {;}
-	| ;
-expr:	cond			{ ; }
-	|ID ';'			{ ; }
-	|bcalc ';'		{ ; }
-	|expr expr ';'		{ ; }
-	|decl ';'
-
-	|print ';'		{ ; }
+expr:	cond			{ $$ = create_expression("expr",NULL,$1,NULL,NULL,NULL,NULL); }
+	|ID ';'			{ $$ = create_expression("expr",NULL,NULL,$1,NULL,NULL,NULL); }
+	|bcalc ';'		{ $$ = create_expression("expr",NULL,NULL,NULL,$1,NULL,NULL); }
+	|expr expr ';'		{ $$ = create_expression("expr",$1,NULL,NULL,NULL,NULL,NULL); }
+	|decl ';'		{ $$ = create_expression("expr",NULL,NULL,NULL,NULL,$1,NULL); }
+	|print ';'		{ $$ = create_expression("expr",NULL,NULL,NULL,NULL,NULL,$1); }
 
 	| error '\n'		{my_return("';' expected");}
 	| error ';'		{my_return("error in expression");}
 
 	|BLANK
 	;
-cond:	IF comp expr		{ if($2 == 1)
-					$$=$3;
-				}
-	|IF comp expr ELSE expr { if($2 == 1)
-					$$=$3;
-				  else
-					$$=$5;
-				}
+cond:	IF comp expr		{ $$ = create_condition("cond",$2,$3,NULL);}
+	|IF comp expr ELSE expr { $$ = create_condition("cond",$2,$3,$5);}
 	;
-comp:	'(' bcalc '=''=' bcalc ')'	{ if($2 == $5)
-						$$=1;
-					  else
-						$$=0;
-					}
+comp:	'(' bcalc '=''=' bcalc ')'	{ $$ = create_comparison("comp",$2,$5);}
 	;
-print:	PRINT '(' bcalc ')'	{ printf("\n%d", $3); }
-	|PRINT '{' ID ')'	{ printf("\n%s", $3); }
+print:	PRINT '(' bcalc ')'	{ $$ = create_print("print",$3,NULL); }
+	|PRINT '(' ID ')'	{ $$ = create_print("print",NULL,$3); }
 	;
 bcalc:	ID			{ char *n = $1;$$ = create_integer("int",getValue(n));} 
 	| INTEGER		{ $$ = create_integer("int",$1); }
@@ -254,7 +337,8 @@ decl:	'int' ID		{char *n = $2;
 				createDecl("int",expr_create_integer_literal($4), n);
 				decl_create($2,"int",expr_create_integer_literal($4),NULL);}
 	| 'String' ID '=' ID	{char *n = $2; char *v = $4; createDecl("String",expr_create_string_literal(v), n); printf("String %s = %s;", n, v);}
-	| ID '=' bcalc		{char *n = $1; assign($3,n);}
+	| ID '=' bcalc		{char *n = $1; assign($3,n);
+				decl_create($1,"int",expr_create_integer_literal($3),NULL);}
 	
 	;
 %%
