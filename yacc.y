@@ -6,6 +6,11 @@
 	int yylineno;
 	void yyerror(char *);
 
+	struct integer{
+		char* node_type;
+		int value;
+	};
+
 	struct decla {
 		char *name;
 		char *type;
@@ -15,7 +20,7 @@
 	struct decla *declar = NULL;
 	struct expres {
 		char *type;
-		int value;
+		struct integer *value;
 		char *sValue;
 	};
 	struct decla * decl_create( char *name,
@@ -37,7 +42,7 @@
 		e->sValue = *str;
 		return e;
 	}
-	struct expres * expr_create_integer_literal( int i ){
+	struct expres * expr_create_integer_literal( struct integer *i ){
 		struct expres *e = malloc(sizeof(*e));
 		e->type = "int";
 		e->value = i;
@@ -115,8 +120,8 @@
 			while(strcmp(dec_temp->name, name) != 0){
 				dec_temp=dec_temp->next;
 			}
-			if(dec_temp->value->value != INT_MIN){
-				return dec_temp->value->value;
+			if(dec_temp->value->value->value != INT_MIN){
+				return dec_temp->value->value->value;
 			}
 			else{
 				my_return("Variable besitzt noch keinen Wert!");
@@ -133,7 +138,7 @@
 			if(strcmp(dec_temp->name, name) == 0){
 				//printf("value before : %i \n", dec_temp->value->value);
 				//printf("value: %i \n", v);
-				dec_temp->value->value = v;
+				dec_temp->value->value->value = v;
 				//printf("seems to work \n");
 				//printf("t->value: %i \n", dec_temp->value->value);
 			}else{
@@ -154,11 +159,11 @@
 		char* node_type;
 		struct calculation *left;
 		struct calculation *right;
-		int value;
+		struct integer *value;
 	};
 	
 
-	struct calculation *create_calculation(char* nodetype, struct calculation *c1, struct calculation *c2, int val){
+	struct calculation *create_calculation(char* nodetype, struct calculation *c1, struct calculation *c2, struct integer *val){
 		struct calculation *c = malloc(sizeof(struct calculation));
 		c->node_type = nodetype;
 		c->left = c1;
@@ -169,9 +174,19 @@
 		return c;
 	}
 
+	struct integer  *create_integer(char* nodetype, int val){
+		struct integer *i = malloc(sizeof(struct integer));
+			i->node_type = nodetype;
+			i->value = val;
+		printf("%s",i->node_type);
+		printf("%d",i->value);
+		return i;
+	}
+
 %}
 
 %token INTEGER ID BLANK IF ELSE FOR PRINT
+
 
 %%
 program: program expr ';' {;}
@@ -207,8 +222,8 @@ comp:	'(' bcalc '=''=' bcalc ')'	{ if($2 == $5)
 print:	PRINT '(' bcalc ')'	{ printf("\n%d", $3); }
 	|PRINT '{' ID ')'	{ printf("\n%s", $3); }
 	;
-bcalc:	ID			{ char *n = $1;$$ = create_calculation("int",NULL,NULL,getValue(n));} 
-	| INTEGER		{ $$ = create_calculation("int",NULL,NULL,$1); }
+bcalc:	ID			{ char *n = $1;$$ = create_integer("int",getValue(n));} 
+	| INTEGER		{ $$ = create_integer("int",$1); }
 	| bcalc '+' bcalc 	{ $$ = create_calculation("+",$1,$2,NULL); }
 	| bcalc '-' bcalc 	{ $$ = create_calculation("-",$1,$2,NULL); }
 	| bcalc '*' bcalc 	{ $$ = create_calculation("*",$1,$2,NULL); }
@@ -217,8 +232,8 @@ bcalc:	ID			{ char *n = $1;$$ = create_calculation("int",NULL,NULL,getValue(n));
 				  else
 					$$ = create_calculation("/",$1,$2,NULL);;
 				}
-	| '-' bcalc		{ $$ = $1; }
-	| '(' bcalc ')'		{ $$ = $2; }
+	| '-' bcalc		{ $$ = create_calculation("*",create_integer("int",-1),$2,NULL); }
+	| '(' bcalc ')'		{ $$ = create_calculation("()",$2,NULL,NULL); }
 
 	| error '+' bcalc	{my_return("first operand missing");}
 	| error '-' bcalc	{my_return("first operand missing");}
@@ -231,9 +246,13 @@ bcalc:	ID			{ char *n = $1;$$ = create_calculation("int",NULL,NULL,getValue(n));
 	| error bcalc ')'	{my_return("'(' expected");}
 	| '(' bcalc error	{my_return("')' expected");}
 	;
-decl:	'int' ID		{char *n = $2; createDecl("int",expr_create_integer_literal(INT_MIN), n); printf("int %s;", n);}
+decl:	'int' ID		{char *n = $2;
+				createDecl("int",expr_create_integer_literal(create_integer("int",INT_MIN)), n);
+				decl_create($2,"int",expr_create_integer_literal(create_integer("int",INT_MIN)),NULL);}
 	| 'String' ID		{char *n = $2; createDecl("String",expr_create_string_literal(NULL), n); printf("String %s;", n);}
-	| 'int' ID '=' bcalc	{char *n = $2; createDecl("int",expr_create_integer_literal($4->value), n); printf("int %s = %d;", n, $4->value);}
+	| 'int' ID '=' bcalc	{char *n = $2;
+				createDecl("int",expr_create_integer_literal($4), n);
+				decl_create($2,"int",expr_create_integer_literal($4),NULL);}
 	| 'String' ID '=' ID	{char *n = $2; char *v = $4; createDecl("String",expr_create_string_literal(v), n); printf("String %s = %s;", n, v);}
 	| ID '=' bcalc		{char *n = $1; assign($3,n);}
 	
