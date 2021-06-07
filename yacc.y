@@ -153,6 +153,26 @@
 		}
 	}
 
+	void printVars(){
+		if(!declar){
+			printf("\nKeine Variablen in Symbolliste gespeichert");
+		}
+		else{
+			struct decla *dec_temp = declar;
+			printf("\nTyp\tName\tWert\n");
+			do{
+				if(strcmp(dec_temp->type, "String") == 0){
+					printf("Da!\n");
+					printf("%s\t%s\t%s\n", dec_temp->type, dec_temp->name, dec_temp->value->sValue);
+				}
+				else{
+					printf("%s\t%s\t%d\n", dec_temp->type, dec_temp->name, dec_temp->value->value->value);
+				}
+				dec_temp = dec_temp->next;
+			}while(dec_temp);
+		}
+	}
+
 	/* -------------- parsing tree ----------------- */
 	
 	struct expression;
@@ -350,6 +370,7 @@ void my_return(char *token) {
 
 void newLine() {
 	yylineno++;
+	printVars();
 }
 
 void yyerror(char *s) {
