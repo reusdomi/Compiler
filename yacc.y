@@ -126,6 +126,8 @@
 	void assign(int v, char *name){
 		struct decla *dec_temp = malloc(sizeof(*dec_temp));
 		dec_temp = declar;
+
+		int found = 0;
 		
 		while(dec_temp){
 		
@@ -133,10 +135,11 @@
 				//printf("value before : %i \n", dec_temp->value->value);
 				//printf("value: %i \n", v);
 				dec_temp->value->value = v;
+				printf("%s = %i", dec_temp->name, dec_temp->value->value);
 				//printf("seems to work \n");
 				//printf("t->value: %i \n", dec_temp->value->value);
-			}else{
-				if(!dec_temp->next){printf("Keine solche Variable enthalten \n");}
+
+				found = 1;
 			}
 			
 			if(dec_temp->next){
@@ -144,6 +147,10 @@
 			}else{
 				break;
 			}
+		}
+
+		if(found == 0) {
+			printf("Keine solche Variable enthalten \n");
 		}
 	}
 %}
