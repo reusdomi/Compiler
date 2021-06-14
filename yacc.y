@@ -162,7 +162,6 @@
 			printf("\nTyp\tName\tWert\n");
 			do{
 				if(strcmp(dec_temp->type, "String") == 0){
-					printf("Da!\n");
 					printf("%s\t%s\t%s\n", dec_temp->type, dec_temp->name, dec_temp->value->sValue);
 				}
 				else{
@@ -370,7 +369,7 @@ void my_return(char *token) {
 
 void newLine() {
 	yylineno++;
-	printVars();
+	//printVars();
 }
 
 void yyerror(char *s) {
