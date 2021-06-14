@@ -135,7 +135,7 @@
 				//printf("value before : %i \n", dec_temp->value->value);
 				//printf("value: %i \n", v);
 				dec_temp->value->value = v;
-				printf("%s = %i", dec_temp->name, dec_temp->value->value);
+				printf("%s = %i;", dec_temp->name, dec_temp->value->value);
 				//printf("seems to work \n");
 				//printf("t->value: %i \n", dec_temp->value->value);
 

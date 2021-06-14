@@ -1,15 +1,16 @@
-Testfile;
-
 // Rechnungen
-print(3/0);
 print(1+1);
-print(2+3);
-print(10/0);
+print(3-2);
+print(2*3);
+print(3/0);
+
+// Klammerung
+print(2*(2+3));
 
 // Variablen Initialisierung
 int a;
 
-// Variablen Deklarationen
+/* Variablen Deklarationen */
 int i = 5;
 int z = 3;
 
@@ -20,8 +21,9 @@ int i = 4;
 i=4;
 a=3;
 
-// Deklaration mit Rechnung
+// Rechnungen mit Variablen
 int r = 5+6;
+print(i+r);
 
 // String Deklaration
 String s = test;
@@ -30,4 +32,5 @@ String z = error;
 // if/else
 if (i==5) print(i); else print(z);
 if (r==11) print(r);
+
 
